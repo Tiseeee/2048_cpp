@@ -6,6 +6,32 @@
 #include <random>
 using namespace std;
 
+void Move_W(int a[4][4]) {
+	for (int col = 0; col < 4; col++) {
+		for (int row = 0; row < 3; row++) {
+			if (a[row][col] == 0) {
+				for (int k = row + 1; k < 4; k++) {
+					if (a[k][col] != 0) {
+						a[row][col] = a[k][col];
+						a[k][col] = 0;
+						break;
+					}
+				}
+			}
+		}
+		for (int row = 0; row < 3; row++) {
+			if (a[row][col] != 0 && a[row][col] == a[row + 1][col]) {
+				a[row][col] *= 2;
+				a[row + 1][col] = 0;
+				for (int k = row + 1; k < 3; k++) {
+					a[k][col] = a[k + 1][col];
+				}
+				a[3][col] = 0;
+			}
+		}
+	}
+}
+
 bool Move(int a[4][4]) {
 	ExMessage m;
 	outtextxy(200, 250, L"press W A S D");
@@ -22,8 +48,10 @@ bool Move(int a[4][4]) {
 						j++;
 						n2 = a[j][i];
 					}
-					if (n1 == n2)
+					if (n1 == n2) {
+						Move_W(a);
 						return true;
+					}
 					else
 						return false;
 				}
@@ -36,38 +64,7 @@ bool Move(int a[4][4]) {
 	return false;
 }
 
-bool Move_W(int a[4][4]) {
-		bool moved = false;
-		for (int col = 0; col < 4; col++) {
-			for (int row = 0; row < 3; row++) {
-				if (a[row][col] == 0) {
-					for (int k = row + 1; k < 4; k++) {
-						if (a[k][col] != 0) {
-							a[row][col] = a[k][col];
-							a[k][col] = 0;
-							moved = true;
-							break;
-						}
-					}
-				}
-			}
-			for (int row = 0; row < 3; row++) {
-				if (a[row][col] != 0 && a[row][col] == a[row + 1][col]) {
-					a[row][col] *= 2;
-					a[row + 1][col] = 0;
-					moved = true;
-					for (int k = row + 1; k < 3; k++) {
-						a[k][col] = a[k + 1][col];
-					}
-					a[3][col] = 0;
-				}
-			}
-		}
-		return moved;
-	}
-
 void MakeNew24(int a[4][4]) {
-	//生成随机数
 	random_device rd; 
 	mt19937 gen(rd());
 	uniform_int_distribution<> dis(0, 10);
@@ -111,13 +108,15 @@ void GameStar() {
 		TCHAR score[20];
 		_stprintf(score, _T("Score: %d"), jifen(a));
 		outtextxy(100, 100, score);
-		if (Move(a)) {
+		if (Move(p)) {
 			Sleep(100);
 			MakeNew24(p);
 			cleardevice();
 			for (int i = 0; i < 4; i++) {
 				for (int j = 0; j < 4; j++) {
-					outtextxy(350 + j * 20, 250 + i * 20, a[i][j] + 48);
+					TCHAR l[20];
+					_stprintf(l, _T(" % d"), a[i][j]);
+					outtextxy(350 + j * 20, 250 + i * 20, l);
 				}
 			}
 		}
