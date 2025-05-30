@@ -32,6 +32,84 @@ void Move_W(int a[4][4]) {
 	}
 }
 
+void Move_A(int a[4][4]) {
+	for (int row = 0; row < 4; row++) {
+		for (int col = 0; col < 3; col++) {
+			if (a[row][col] == 0) {
+				for (int k = col + 1; k < 4; k++) {
+					if (a[row][k] != 0) {
+						a[row][col] = a[row][k];
+						a[row][k] = 0;
+						break;
+					}
+				}
+			}
+		}
+		for (int col = 0; col < 3; col++) {
+			if (a[row][col] != 0 && a[row][col] == a[row][col + 1]) {
+				a[row][col] *= 2;
+				a[row][col + 1] = 0;
+				for (int k = col + 1; k < 3; k++) {
+					a[row][k] = a[row][k + 1];
+				}
+				a[row][3] = 0;
+			}
+		}
+	}
+}
+
+void Move_S(int a[4][4]) {
+	for (int col = 0; col < 4; col++) {
+		for (int row = 3; row > 0; row--) {
+			if (a[row][col] == 0) {
+				for (int k = row - 1; k >= 0; k--) {
+					if (a[k][col] != 0) {
+						a[row][col] = a[k][col];
+						a[k][col] = 0;
+						break;
+					}
+				}
+			}
+		}
+		for (int row = 3; row > 0; row--) {
+			if (a[row][col] != 0 && a[row][col] == a[row - 1][col]) {
+				a[row][col] *= 2;
+				a[row - 1][col] = 0;
+				for (int k = row - 1; k > 0; k--) {
+					a[k][col] = a[k - 1][col];
+				}
+				a[0][col] = 0;
+			}
+		}
+	}
+}
+
+void Move_D(int a[4][4]) {
+	for (int row = 0; row < 4; row++) {
+		for (int col = 3; col > 0; col--) {
+			if (a[row][col] == 0) {
+				for (int k = col - 1; k >= 0; k--) {
+					if (a[row][k] != 0) {
+						a[row][col] = a[row][k];
+						a[row][k] = 0;
+						break;
+					}
+				}
+			}
+		}
+		for (int col = 3; col > 0; col--) {
+			if (a[row][col] != 0 && a[row][col] == a[row][col - 1]) {
+				a[row][col] *= 2;
+				a[row][col - 1] = 0;
+				for (int k = col - 1; k > 0; k--) {
+					a[row][k] = a[row][k - 1];
+				}
+				a[row][0] = 0;
+			}
+		}
+	}
+}
+
 bool Move(int a[4][4]) {
 	ExMessage m;
 	outtextxy(200, 250, L"press W A S D");
@@ -56,9 +134,60 @@ bool Move(int a[4][4]) {
 						return false;
 				}
 			}
-			if (m.vkcode == 'A') {}
-			if (m.vkcode == 'S') {}
-			if (m.vkcode == 'D') {}
+			if (m.vkcode == 'A') {
+				for (int i = 0, j = 0, n1 = 0, n2 = 0; i < 4; i++) {
+					while (a[i][j + 1] == 0 && j < 3) {
+						j++;
+						n1 = a[i][j];
+					}
+					while (a[i][j + 1] == 0 && j < 3) {
+						j++;
+						n2 = a[i][j];
+					}
+					if (n1 == n2) {
+						Move_A(a);
+						return true;
+					}
+					else
+						return false;
+				}
+			}
+			if (m.vkcode == 'S') {
+				for (int i = 0, j = 0, n1 = 0, n2 = 0; i < 4; i++) {
+					while (a[j + 1][i] == 0 && j < 3) {
+						j++;
+						n1 = a[j][i];
+					}
+					while (a[j + 1][i] == 0 && j < 3) {
+						j++;
+						n2 = a[j][i];
+					}
+					if (n1 == n2) {
+						Move_S(a);
+						return true;
+					}
+					else
+						return false;
+				}
+			}
+			if (m.vkcode == 'D') {
+				for (int i = 0, j = 0, n1 = 0, n2 = 0; i < 4; i++) {
+					while (a[i][j + 1] == 0 && j < 3) {
+						j++;
+						n1 = a[i][j];
+					}
+					while (a[i][j + 1] == 0 && j < 3) {
+						j++;
+						n2 = a[i][j];
+					}
+					if (n1 == n2) {
+						Move_D(a);
+						return true;
+					}
+					else
+						return false;
+				}
+			}
 		}
 	}
 	return false;
@@ -114,13 +243,14 @@ void GameStar() {
 			cleardevice();
 			for (int i = 0; i < 4; i++) {
 				for (int j = 0; j < 4; j++) {
-					TCHAR l[20];
-					_stprintf(l, _T(" % d"), a[i][j]);
-					outtextxy(350 + j * 20, 250 + i * 20, l);
+					if (a[i][j] != 0) {
+						TCHAR l[20];
+						_stprintf(l, _T(" % d"), a[i][j]);
+						outtextxy(350 + j * 30, 250 + i * 30, l);
+					}
 				}
 			}
 		}
-		
 	}
 }
 
