@@ -5,6 +5,7 @@
 #include <ctime>
 #include <random>
 #include <cstdlib>
+#include "fileinput.h"
 using namespace std;
 
 bool RESTART = false;
@@ -128,6 +129,7 @@ bool Move(int a[4][4]) {
 							n2 = a[i - 1][j];
 							if (n1 == n2 || n2 == 0) {
 								Move_W(a);
+								opear(m);
 								return true;
 							}
 						}
@@ -143,6 +145,7 @@ bool Move(int a[4][4]) {
 							n2 = a[i][j - 1];
 							if (n1 == n2 || n2 == 0) {
 								Move_A(a);
+								opear(m);
 								return true;
 							}
 						}
@@ -158,6 +161,7 @@ bool Move(int a[4][4]) {
 							n2 = a[i + 1][j];
 							if (n1 == n2 || n2 == 0) {
 								Move_S(a);
+								opear(m);
 								return true;
 							}
 						}
@@ -173,6 +177,7 @@ bool Move(int a[4][4]) {
 							n2 = a[i][j + 1];
 							if (n1 == n2 || n2 == 0) {
 								Move_D(a);
+								opear(m);
 								return true;
 							}
 						}
@@ -182,10 +187,12 @@ bool Move(int a[4][4]) {
 			}
 			if (m.vkcode == 'R') {
 				RESTART = true;
+				opear(m);
 				return false;
 			}
 			if (m.vkcode == 'Q') {
 				EXIT = true;
+				opear(m);
 				return false;
 			}
 		}
@@ -241,11 +248,13 @@ void GameStar() {
 		outtextxy(200, 200, score);
 		if (RESTART) {
 			cleardevice();
+			scoreinput(jifen(a));
 			outtextxy(350, 250, L"Press F to Star");
 			outtextxy(350, 270, L"Press Q to Quit");
 			return;
 		}
 		if (EXIT) {
+			scoreinput(jifen(a));
 			return;
 		}
 		if (Move(p)) {
