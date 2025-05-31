@@ -4,7 +4,11 @@
 #include <Windows.h>
 #include <ctime>
 #include <random>
+#include <cstdlib>
 using namespace std;
+
+bool RESTART = false;
+bool EXIT = false;
 
 void Move_W(int a[4][4]) {
 	for (int col = 0; col < 4; col++) {
@@ -112,81 +116,77 @@ void Move_D(int a[4][4]) {
 
 bool Move(int a[4][4]) {
 	ExMessage m;
-	outtextxy(200, 250, L"press W A S D");
+	outtextxy(200, 250, L"press W A S D or Q");
 	while (1) {
 		peekmessage(&m, EX_KEY);
 		if (m.message == WM_KEYDOWN) {
 			if (m.vkcode == 'W') {
-				for (int i = 0, j = 0, n1 = 0, n2 = 0; i < 4; i++) {
-					while (a[j + 1][i] == 0 && j < 3) {
-						j++;
-						n1 = a[j][i];
+				for (int j = 0; j < 4; j++) {
+					for (int i = 3,n1=0,n2=0; 0 < i; i--) {
+						if (a[i][j]) {
+							n1 = a[i][j];
+							n2 = a[i - 1][j];
+							if (n1 == n2 || n2 == 0) {
+								Move_W(a);
+								return true;
+							}
+						}
 					}
-					while (a[j + 1][i] == 0 && j < 3) {
-						j++;
-						n2 = a[j][i];
-					}
-					if (n1 == n2) {
-						Move_W(a);
-						return true;
-					}
-					else
-						return false;
 				}
+				return false;
 			}
 			if (m.vkcode == 'A') {
-				for (int i = 0, j = 0, n1 = 0, n2 = 0; i < 4; i++) {
-					while (a[i][j + 1] == 0 && j < 3) {
-						j++;
-						n1 = a[i][j];
+				for (int i = 0; i < 4; i++) {
+					for (int j = 3, n1 = 0, n2 = 0; 0 < j; j--) {
+						if (a[i][j]) {
+							n1 = a[i][j];
+							n2 = a[i][j - 1];
+							if (n1 == n2 || n2 == 0) {
+								Move_A(a);
+								return true;
+							}
+						}
 					}
-					while (a[i][j + 1] == 0 && j < 3) {
-						j++;
-						n2 = a[i][j];
-					}
-					if (n1 == n2) {
-						Move_A(a);
-						return true;
-					}
-					else
-						return false;
 				}
+				return false;
 			}
 			if (m.vkcode == 'S') {
-				for (int i = 0, j = 0, n1 = 0, n2 = 0; i < 4; i++) {
-					while (a[j + 1][i] == 0 && j < 3) {
-						j++;
-						n1 = a[j][i];
+				for (int j = 0; j < 4; j++) {
+					for (int i = 0, n1 = 0, n2 = 0; i < 3; i++) {
+						if (a[i][j]) {
+							n1 = a[i][j];
+							n2 = a[i + 1][j];
+							if (n1 == n2 || n2 == 0) {
+								Move_S(a);
+								return true;
+							}
+						}
 					}
-					while (a[j + 1][i] == 0 && j < 3) {
-						j++;
-						n2 = a[j][i];
-					}
-					if (n1 == n2) {
-						Move_S(a);
-						return true;
-					}
-					else
-						return false;
 				}
+				return false;
 			}
 			if (m.vkcode == 'D') {
-				for (int i = 0, j = 0, n1 = 0, n2 = 0; i < 4; i++) {
-					while (a[i][j + 1] == 0 && j < 3) {
-						j++;
-						n1 = a[i][j];
+				for (int i = 0; i < 4; i++) {
+					for (int j = 0, n1 = 0, n2 = 0; j < 3; j++) {
+						if (a[i][j]) {
+							n1 = a[i][j];
+							n2 = a[i][j + 1];
+							if (n1 == n2 || n2 == 0) {
+								Move_D(a);
+								return true;
+							}
+						}
 					}
-					while (a[i][j + 1] == 0 && j < 3) {
-						j++;
-						n2 = a[i][j];
-					}
-					if (n1 == n2) {
-						Move_D(a);
-						return true;
-					}
-					else
-						return false;
 				}
+				return false;
+			}
+			if (m.vkcode == 'R') {
+				RESTART = true;
+				return false;
+			}
+			if (m.vkcode == 'Q') {
+				EXIT = true;
+				return false;
 			}
 		}
 	}
@@ -229,18 +229,30 @@ int jifen(int a[4][4]) {
 }
 
 void GameStar() {
+	RESTART = false;
 	cleardevice();
 	int a[4][4] = { 0 };
 	int(*p)[4] = a;
+	MakeNew24(p);
 	while (1)
 	{	
 		TCHAR score[20];
 		_stprintf(score, _T("Score: %d"), jifen(a));
-		outtextxy(100, 100, score);
+		outtextxy(200, 200, score);
+		if (RESTART) {
+			cleardevice();
+			outtextxy(350, 250, L"Press F to Star");
+			outtextxy(350, 270, L"Press Q to Quit");
+			return;
+		}
+		if (EXIT) {
+			return;
+		}
 		if (Move(p)) {
 			Sleep(100);
 			MakeNew24(p);
 			cleardevice();
+			rectangle(470, 240, 340, 370);
 			for (int i = 0; i < 4; i++) {
 				for (int j = 0; j < 4; j++) {
 					if (a[i][j] != 0) {
@@ -267,7 +279,9 @@ int main() {
 			if (f.vkcode == 'F')
 				GameStar();
 		}
-
+		if (EXIT) {
+			return 0;
+		}
 		if (f.message == WM_KEYDOWN)
 		{
 			if (f.vkcode == 'Q')
